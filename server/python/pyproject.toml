@@ -1,0 +1,14 @@
+[project]
+name = "multi-mcp-python-server"
+version = "0.1.0"
+description = "MCP Server in Python"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=1.9.2",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.12",
+]
