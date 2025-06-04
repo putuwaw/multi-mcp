@@ -1,0 +1,25 @@
+{
+  "name": "multi-mcp-ts-server",
+  "version": "0.1.0",
+  "description": "MCP TypeScript Server",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "npx tsx server.ts"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "typescript"
+  ],
+  "author": "Putu Widyantara",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.2",
+    "badge-maker": "^4.1.0",
+    "typescript": "^5.8.3",
+    "zod": "^3.24.4"
+  },
+  "type": "module"
+}
