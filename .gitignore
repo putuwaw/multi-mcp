@@ -1,6 +1,12 @@
+# python
 .ruff_cache/
 .venv/
+
+# ts
 node_modules/
 dist/
+
+# java
 *.class
 .idea/
+target/
