@@ -44,7 +44,7 @@ public class Main {
     private static McpServerFeatures.@NotNull AsyncToolSpecification getAsyncToolSpecification() {
         String csv_schema = ToolSchema.csvHead();
         return new McpServerFeatures.AsyncToolSpecification(
-                new Tool("Iris csv data", "Get top data for iris csv", csv_schema),
+                new Tool("iris_csv", "Get top data for iris csv", csv_schema),
                 (exchange, arguments) -> {
                     SparkCSV sparkCSV = new SparkCSV();
                     String result;
