@@ -22,12 +22,14 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
+        System.setProperty("org.slf4j.simpleLogger.log.org.apache", "ERROR");
+        System.setProperty("org.slf4j.simpleLogger.log.org.sparkproject", "ERROR");
+
         ObjectMapper objectMapper = new ObjectMapper();
         StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(objectMapper);
 
         var capabilities = McpSchema.ServerCapabilities.builder()
                 .tools(true)
-                .logging()
                 .build();
         McpAsyncServer asyncServer = McpServer.async(transportProvider)
                 .serverInfo("Demo", "0.1.0")
@@ -49,7 +51,13 @@ public class Main {
                     SparkCSV sparkCSV = new SparkCSV();
                     String result;
                     try {
-                        Integer n_row = (Integer) arguments.get("n");
+                        var n = arguments.get("n");
+                        Integer n_row;
+                        if (n instanceof Double) {
+                            n_row = ((Double) n).intValue();
+                        } else {
+                            n_row = (Integer) n;
+                        }
                         result = sparkCSV.getRow(n_row);
                     } catch (ClassCastException e) {
                         return Mono.just(new CallToolResult("Failed to cast int: " + e.getMessage(), true));
