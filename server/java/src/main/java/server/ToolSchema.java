@@ -13,7 +13,10 @@ public final class ToolSchema {
             "n": {
               "type": "number"
             }
-          }
+          },
+          "required": [
+            "n"
+          ]
         }
         """;
 
