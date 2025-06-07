@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "python": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "putuwaw/multi-mcp-python-server"
+      ]
+    },
+    "ts": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "putuwaw/multi-mcp-ts-server"
+      ]
+    },
+    "java": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "-p",
+        "4040:4040",
+        "--rm",
+        "putuwaw/multi-mcp-java-server"
+      ]
+    }
+  }
+}
