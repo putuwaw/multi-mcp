@@ -1,6 +1,7 @@
 # python
 .ruff_cache/
 .venv/
+__pycache__/
 
 # ts
 node_modules/
