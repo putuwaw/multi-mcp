@@ -42,14 +42,12 @@ async def main():
             )
 
             transport = await stack.enter_async_context(stdio_client(server_params))
-            client.stdio_transport[server] = transport
-
             read_stream, write_stream = transport
             session = await stack.enter_async_context(
                 ClientSession(read_stream, write_stream)
             )
-            client.session[server] = session
             await session.initialize()
+            client.session[server] = session
             print(f"Successfully connected to server: {server}")
 
             response = await session.list_tools()
@@ -64,7 +62,6 @@ async def main():
             print(f"{i + 1}. [{tool.server}] {tool.name} - {tool.description}")
         while True:
             choice = input("\nSelect a tool by number (or 'quit' to quit): ")
-            print("result:", choice)
             if "quit" in choice.lower():
                 print("Exiting...")
                 break
