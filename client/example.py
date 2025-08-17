@@ -1,32 +1,28 @@
 import asyncio
 import json
 from contextlib import AsyncExitStack
+from typing import List
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
-from schema import MCPClient, MCPServerConfig, MultiMCPTool
-
-
-def prompt_for_args(input_schema: dict) -> dict | None:
-    args = {}
-    for key in input_schema["required"]:
-        key_dtype = input_schema["properties"][key]["type"]
-        value = input(f"Enter value for {key}: ")
-
-        if key_dtype == "number":
-            try:
-                value = int(value)
-            except ValueError:
-                print(f"Invalid input for {key}. Expected a number.")
-                return None
-
-        args[key] = value
-    return args
+from schema import (
+    MCPClient,
+    MCPServerConfig,
+)
+from mcp.types import (
+    TextContent,
+    ImageContent,
+    EmbeddedResource,
+    TextResourceContents,
+    BlobResourceContents,
+)
+from ollama import Tool, chat, Message
 
 
 async def main():
     client = MCPClient()
-    list_tools: list[MultiMCPTool] = []
+    list_tools: List[Tool] = []
+    model_name = "llama3.2:3b"
 
     with open("server.json", "r") as f:
         server_json = json.load(f)
@@ -54,39 +50,75 @@ async def main():
             tools = response.tools
 
             for tool in tools:
-                new_tool = MultiMCPTool(server=server, **tool.model_dump())
-                list_tools.append(new_tool)
-
-        print("Available Tools:\n")
-        for i, tool in enumerate(list_tools):
-            print(f"{i + 1}. [{tool.server}] {tool.name} - {tool.description}")
-        while True:
-            choice = input("\nSelect a tool by number (or 'quit' to quit): ")
-            if "quit" in choice.lower():
-                print("Exiting...")
-                break
-            try:
-                selected_tool = list_tools[int(choice) - 1]
-            except (IndexError, ValueError):
-                print("Please enter a valid number.")
-                continue
-
-            args = prompt_for_args(selected_tool.inputSchema)
-            if args is None:
-                print("Invalid input. Please try again.")
-                continue
-
-            print(f"Calling tool {selected_tool.name} with args: {args}")
-            if selected_tool.server == "java":
-                print("[INFO] You can open localhost:4040 to see the Spark UI.")
-            try:
-                result = await client.session[selected_tool.server].call_tool(
-                    name=selected_tool.name,
-                    arguments=args,
+                tool = Tool(
+                    function=Tool.Function(
+                        # add server name to prevent name conflicts between different servers
+                        name=f"{server}_{tool.name}",
+                        description=tool.description,
+                        parameters=Tool.Function.Parameters(
+                            type=tool.inputSchema.get("type", "object"),
+                            properties=tool.inputSchema.get("properties", {}),
+                            required=tool.inputSchema.get("required"),
+                        ),  # type: ignore
+                    )
                 )
-                print(f"Tool call result: {result}")
-            except Exception as e:
-                print(f"Error calling tool {selected_tool.name}: {e}")
+                list_tools.append(tool)
+
+        messages: List[Message] = []
+        while True:
+            user_input = input("You: ")
+            if user_input.lower() == "exit" or user_input.lower() == "quit":
+                break
+
+            messages.append(Message(role="user", content=user_input))
+
+            response = chat(
+                model=model_name,
+                messages=messages,
+                tools=list_tools,
+            )
+
+            messages.append(response.message)
+            if response.message.tool_calls:
+                for tool in response.message.tool_calls:
+                    server_name = tool.function.name.split("_")[0]
+                    original_tool_name = tool.function.name.split("_", 1)[1]
+
+                    print(
+                        f"Calling tool: {tool.function.name} with arguments: {tool.function.arguments}"
+                    )
+                    output = await client.session[server_name].call_tool(
+                        original_tool_name, dict(tool.function.arguments)
+                    )
+
+                    final_output = ""
+                    for content in output.content:
+                        if isinstance(content, TextContent):
+                            final_output += content.text
+                        elif isinstance(content, ImageContent):
+                            final_output += f"[Image: {content.data}]"
+                        elif isinstance(content, EmbeddedResource):
+                            if isinstance(content.resource, TextResourceContents):
+                                final_output += f"[Resource: {content.resource.text}]"
+                            elif isinstance(content.resource, BlobResourceContents):
+                                final_output += f"[Resource: {content.resource.uri}]"
+
+                    print(f"Tool output: {output}")
+                    messages.append(
+                        Message(
+                            role="tool",
+                            content=final_output,
+                            tool_name=tool.function.name,
+                        )
+                    )
+
+            final_response = chat(
+                model=model_name,
+                messages=messages,
+            )
+            print(f"LLM: {final_response.message.content}")
+            messages.append(final_response.message)
+
         print("Closing all sessions...")
     print("All sessions closed.")
 
