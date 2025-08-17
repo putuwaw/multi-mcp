@@ -5,8 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "google-genai>=1.19.0",
     "mcp[cli]>=1.9.3",
+    "ollama>=0.5.3",
 ]
 
 [dependency-groups]
