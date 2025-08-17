@@ -24,6 +24,14 @@ WORKDIR /app
 # install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
+# install ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# run ollama
+RUN ollama serve & \
+    sleep 5 && \
+    ollama pull llama3.2:3b
+
 # copy all files
 COPY . .
 
@@ -31,4 +39,4 @@ COPY . .
 RUN uv sync --frozen
 
 # run the example
-CMD [ "uv", "run", "python", "example.py" ]
+CMD ["bash", "-c", "nohup ollama serve > ollama.log 2>&1 & uv run python example.py"]
