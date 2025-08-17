@@ -1,15 +1,16 @@
+import math
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Demo")
 
 
 @mcp.tool(
-    name="Get weather",
-    description="Get the current weather for a specified location",
+    name="square_root",
+    description="Calculate square root"
 )
-async def get_weather(location: str) -> str:
-    """Get the weather for a given location"""
-    return f"The weather in {location} is sunny!"
+async def square_root(number: float) -> float:
+    """Calculate square root"""
+    return math.sqrt(number)
 
 
 @mcp.prompt(
