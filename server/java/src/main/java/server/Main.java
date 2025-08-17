@@ -55,8 +55,12 @@ public class Main {
                         Integer n_row;
                         if (n instanceof Double) {
                             n_row = ((Double) n).intValue();
-                        } else {
+                        } else if (n instanceof Integer) {                            
                             n_row = (Integer) n;
+                        } else if (n instanceof String){
+                            n_row = Integer.parseInt((String) n);
+                        } else {
+                            n_row = 5;
                         }
                         result = sparkCSV.getRow(n_row);
                     } catch (ClassCastException e) {
