@@ -2,13 +2,13 @@
 
 MCP Server in Typescript.
 
-## Build:
+## Try the MCP
+Pull the Docker image:
 ```
-docker build -t mcp-ts-server .
+docker pull putuwaw/multi-mcp-ts-server
 ```
 
-## Test
 Try the MCP using Postman:
 ```
-docker run -i --rm --name mcp-server mcp-ts-server
+docker run -i --rm --name mcp-server putuwaw/multi-mcp-ts-server
 ```

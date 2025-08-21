@@ -2,13 +2,13 @@
 
 MCP Server in Java.
 
-## Build:
+## Try the MCP
+Pull the Docker image:
 ```
-docker build -t mcp-java-server .
+docker pull putuwaw/multi-mcp-java-server
 ```
 
-## Test
 Try the MCP using Postman (forward port 4040 to see the Spark UI):
 ```
-docker run -i --rm -p 4040:4040 mcp-java-server
+docker run -i --rm -p 4040:4040 putuwaw/multi-mcp-java-server
 ```

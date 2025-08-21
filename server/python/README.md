@@ -2,13 +2,13 @@
 
 MCP Server in Python.
 
-## Build:
+## Try the MCP
+Pull the Docker image:
 ```
-docker build -t mcp-python-server .
+docker pull putuwaw/multi-mcp-python-server
 ```
 
-## Test
 Try the MCP using Postman:
 ```
-docker run -i --rm --name mcp-server mcp-python-server
+docker run -i --rm --name mcp-server putuwaw/multi-mcp-python-server
 ```
