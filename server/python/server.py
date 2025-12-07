@@ -1,16 +1,30 @@
 import math
 from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel
+
 
 mcp = FastMCP("Demo")
 
 
+class SquareRootOutput(BaseModel):
+    result: float
+    is_error: bool
+
+
+class SquareRootInput(BaseModel):
+    number: float
+
+
 @mcp.tool(
     name="square_root",
-    description="Calculate square root"
+    description="Calculate square root",
+    structured_output=True,
 )
-async def square_root(number: float) -> float:
+async def square_root(input: SquareRootInput) -> SquareRootOutput:
     """Calculate square root"""
-    return math.sqrt(number)
+    if input.number < 0:
+        return SquareRootOutput(result=0.0, is_error=True)
+    return SquareRootOutput(result=math.sqrt(input.number), is_error=False)
 
 
 @mcp.prompt(
